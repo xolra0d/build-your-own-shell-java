@@ -26,7 +26,7 @@ public class Main {
                 if (command_type != Command.NOT_FOUND) {
                     yield command_type.getCommandName() + " is a shell builtin";
                 } else {
-                    yield fullCommand[0] + ": command not found";
+                    yield fullCommand[1] + ": command not found";
                 }
             }
 
