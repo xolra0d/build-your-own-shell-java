@@ -8,13 +8,16 @@ public class Main {
 
             Scanner scanner = new Scanner(System.in);
             String input = scanner.nextLine();
-            String[] split_input = input.split(" ");
+            String[] split = input.split(" ", 2);
+            String command = split[0];
+            String params = split[1];
 
-            if (Objects.equals(split_input[0], "exit")) {
+            if (Objects.equals(command, "exit")) {
                 break;
-            }
-            else {
-                System.out.println(split_input[0] + ": command not found");
+            } else if (Objects.equals(command, "echo")) {
+                System.out.printf(params);
+            } else {
+                System.out.println(command + ": command not found");
             }
         }
     }
