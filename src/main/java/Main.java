@@ -10,7 +10,11 @@ public class Main {
             String input = scanner.nextLine();
             String[] split = input.split(" ", 2);
             String command = split[0];
-            String params = split[1];
+
+            if (input.contains(" ")) {
+                String params = split[1];
+
+            }
 
             if (Objects.equals(command, "exit")) {
                 break;
