@@ -11,15 +11,14 @@ public class Main {
             String[] split = input.split(" ", 2);
             String command = split[0];
 
-            if (input.contains(" ")) {
-                String params = split[1];
-
-            }
-
             if (Objects.equals(command, "exit")) {
                 break;
             } else if (Objects.equals(command, "echo")) {
-                System.out.println(params);
+                if (input.contains(" ")) {
+                    String params = split[1];
+                    System.out.println(params);
+                }
+
             } else {
                 System.out.println(command + ": command not found");
             }
