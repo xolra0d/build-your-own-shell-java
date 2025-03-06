@@ -13,6 +13,9 @@ public class Main {
             if (Objects.equals(split_input[0], "exit")) {
                 break;
             }
+            else {
+                System.out.println(split_input[0] + ": command not found");
+            }
         }
     }
 }
