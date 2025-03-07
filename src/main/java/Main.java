@@ -75,7 +75,6 @@ public class Main {
                 if (filePath.isEmpty()) {
                     yield fullCommand[0] + ": command not found";
                 }
-                fullCommand[0] = filePath.get();
                 executeBinary(fullCommand);
                 yield "";
             }
