@@ -1,3 +1,4 @@
+import java.io.File;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -7,7 +8,7 @@ public class Main {
         return fullCommand.length != 0;
     }
 
-    private static void handleCommands(String[] fullCommand) {
+    private static void handleCommands(String[] fullCommand, String[] paths) {
         Command command = Command.fromString(fullCommand[0]);
 
         String output_msg = switch (command) {
@@ -25,18 +26,27 @@ public class Main {
                 Command command_type = Command.fromString(fullCommand[1]);
                 if (command_type != Command.NOT_FOUND) {
                     yield command_type.getCommandName() + " is a shell builtin";
-                } else {
+                }
+                else {
+                    for (String dirname: paths) {
+                        String filePath = dirname + "/" + fullCommand[1];
+                        File file = new File(filePath);
+                        if (file.exists()) {
+                            yield fullCommand[1] + " is " + filePath;
+                        }
+                    }
                     yield fullCommand[1] + ": not found";
                 }
             }
-
             default -> fullCommand[0] + ": command not found";
         };
 
         System.out.println(output_msg);
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
+        String[] paths = System.getenv("PATH").split(":");
+
         Scanner in = new Scanner(System.in);
         String inputCommand;
         String[] fullCommand;
@@ -48,7 +58,7 @@ public class Main {
             fullCommand = inputCommand.split("\\s+");
 
             if (commandCheck(fullCommand))
-                handleCommands(fullCommand);
+                handleCommands(fullCommand, paths);
         }
     }
 }
