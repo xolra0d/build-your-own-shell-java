@@ -70,6 +70,9 @@ public class Main {
                     yield fullCommand[1] + ": not found";
                 }
             }
+            case PWD -> {
+                yield System.getProperty("user.dir");
+            }
             default -> { // either not found or call of external command
                 Optional<String> filePath = getFilePath(fullCommand[0]);
                 if (filePath.isEmpty()) {

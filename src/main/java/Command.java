@@ -2,6 +2,7 @@ public enum Command {
     ECHO("echo"),
     EXIT("exit"),
     TYPE("type"),
+    PWD("pwd"),
     NOT_FOUND("notFound");
 
     private final String commandName;
