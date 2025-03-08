@@ -8,10 +8,21 @@ import java.util.Scanner;
 
 
 public class Main {
-    private static boolean commandCheck(String[] fullCommand) {
-        return fullCommand.length != 0;
-    }
+    private static File currentDirectory = new File(System.getProperty("user.dir"));
 
+    private static String type(String command) {
+        Command command_type = Command.fromString(command);
+        if (command_type != Command.NOT_FOUND) {
+            return command_type.getCommandName() + " is a shell builtin";
+        }
+        else {
+            Optional<String> filePath = getFilePath(command);
+            if (filePath.isPresent()) {
+                return command + " is " + filePath.get();
+            }
+            return command + ": not found";
+        }
+    }
     private static void executeBinary(String[] params) {
         ProcessBuilder processBuilder = new ProcessBuilder(params);
 
@@ -29,18 +40,40 @@ public class Main {
             e.printStackTrace();
         }
     }
-
     private static Optional<String> getFilePath(String filename) {
         String[] paths = System.getenv("PATH").split(":");
         for (String dirname: paths) {
             String filePath = dirname + "/" + filename;
             File file = new File(filePath);
-//            System.out.println(filePath);
             if (file.exists()) {
                 return Optional.of(dirname + "/" + filename);
             }
         }
         return Optional.empty();
+    }
+    private static String notFoundOrCall(String[] fullCommand) {
+        // either not found or call of external command
+        Optional<String> filePath = getFilePath(fullCommand[0]);
+        if (filePath.isEmpty()) {
+            return fullCommand[0] + ": command not found";
+        }
+        executeBinary(fullCommand);
+        return "";
+    }
+    private static String exit(int exitCode) {
+        try {
+            System.exit(exitCode);
+            return "";
+        } catch (NumberFormatException e) {
+            throw new ArithmeticException("Invalid exit code. Please provide a valid integer.");
+        }
+    }
+    private static String cd(String newPath) {
+        if (!(new File(newPath).exists())) {
+            return "cd: " + newPath + ": No such file or directory";
+        }
+        currentDirectory = new File(newPath);
+        return "";
     }
 
     private static void handleCommands(String[] fullCommand) {
@@ -48,40 +81,13 @@ public class Main {
 
         String output_msg = switch (command) {
             case ECHO -> String.join(" ", Arrays.copyOfRange(fullCommand, 1, fullCommand.length));
-            case EXIT -> {
-                try {
-                    int exitCode = Integer.parseInt(fullCommand[1]);
-                    System.exit(exitCode);
-                    yield "";
-                } catch (NumberFormatException e) {
-                    yield  "Invalid exit code. Please provide a valid integer.";
-                }
-            }
-            case TYPE -> {
-                Command command_type = Command.fromString(fullCommand[1]);
-                if (command_type != Command.NOT_FOUND) {
-                    yield command_type.getCommandName() + " is a shell builtin";
-                }
-                else {
-                    Optional<String> filePath = getFilePath(fullCommand[1]);
-                    if (filePath.isPresent()) {
-                        yield fullCommand[1] + " is " + filePath.get();
-                    }
-                    yield fullCommand[1] + ": not found";
-                }
-            }
-            case PWD -> {
-                yield System.getProperty("user.dir");
-            }
-            default -> { // either not found or call of external command
-                Optional<String> filePath = getFilePath(fullCommand[0]);
-                if (filePath.isEmpty()) {
-                    yield fullCommand[0] + ": command not found";
-                }
-                executeBinary(fullCommand);
-                yield "";
-            }
+            case EXIT -> exit(Integer.parseInt(fullCommand[1]));
+            case TYPE -> type(fullCommand[1]);
+            case PWD -> currentDirectory.getAbsolutePath();
+            case CD -> cd(fullCommand[1]);
+            default -> notFoundOrCall(fullCommand);
         };
+
         if (!output_msg.isEmpty()) {
             System.out.println(output_msg);
         }
@@ -98,8 +104,7 @@ public class Main {
             inputCommand = in.nextLine();
             fullCommand = inputCommand.split("\\s+");
 
-            if (commandCheck(fullCommand))
-                handleCommands(fullCommand);
+            handleCommands(fullCommand);
         }
     }
 }

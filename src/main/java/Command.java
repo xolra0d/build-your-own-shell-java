@@ -3,6 +3,7 @@ public enum Command {
     EXIT("exit"),
     TYPE("type"),
     PWD("pwd"),
+    CD("cd"),
     NOT_FOUND("notFound");
 
     private final String commandName;
