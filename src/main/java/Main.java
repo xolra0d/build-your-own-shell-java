@@ -25,6 +25,7 @@ public class Main {
     }
     private static void executeBinary(String[] params) {
         ProcessBuilder processBuilder = new ProcessBuilder(params);
+        processBuilder.directory(currentDirectory);
 
         try {
             Process process = processBuilder.start();
@@ -51,6 +52,17 @@ public class Main {
         }
         return Optional.empty();
     }
+    private static String processPaths(String currentPath, String nextPath) {
+        for (int i = 0; i < nextPath.length(); ++i) {
+            if (nextPath.startsWith("./", i)) {
+                nextPath = nextPath.substring(0, i) + nextPath.substring(i + 2);
+            }
+            if (nextPath.startsWith("../", i)) {
+                currentPath = Arrays.toString(Arrays.copyOfRange(currentPath.split("/"), 0, currentPath.split("/").length - 1));
+            }
+        }
+        return currentPath + nextPath;
+    }
     private static String notFoundOrCall(String[] fullCommand) {
         // either not found or call of external command
         Optional<String> filePath = getFilePath(fullCommand[0]);
@@ -68,7 +80,9 @@ public class Main {
             throw new ArithmeticException("Invalid exit code. Please provide a valid integer.");
         }
     }
-    private static String cd(String newPath) {
+    private static String cd(String path) {
+        String newPath = processPaths(currentDirectory.getAbsolutePath(), path);
+
         if (!(new File(newPath).exists())) {
             return "cd: " + newPath + ": No such file or directory";
         }
