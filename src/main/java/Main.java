@@ -61,6 +61,9 @@ public class Main {
                 currentPath = Arrays.toString(Arrays.copyOfRange(currentPath.split("/"), 0, currentPath.split("/").length - 1));
             }
         }
+        if (nextPath.startsWith("/")) {
+            return nextPath;
+        }
         return currentPath + nextPath;
     }
     private static String notFoundOrCall(String[] fullCommand) {
