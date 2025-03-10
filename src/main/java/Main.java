@@ -64,7 +64,7 @@ public class Main {
         if (nextPath.startsWith("/")) {
             return nextPath;
         }
-        return currentPath + nextPath;
+        return currentPath + "/" + nextPath;
     }
     private static String notFoundOrCall(String[] fullCommand) {
         // either not found or call of external command
